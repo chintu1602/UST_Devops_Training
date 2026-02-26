@@ -1,0 +1,30 @@
+2026-02-18 10:00:01 INFO user1 GET /home 200
+2026-02-18 10:00:02 INFO user2 GET /dashboard 200
+2026-02-18 10:00:03 INFO user1 GET /settings 200
+2026-02-18 10:00:04 INFO user2 GET /home 200
+2026-02-18 10:00:05 INFO user1 POST /update 200
+2026-02-18 10:00:06 INFO user2 GET /home 200
+2026-02-18 10:00:07 INFO user1 GET /profile 200
+2026-02-18 10:00:08 INFO user2 GET /dashboard 200
+2026-02-18 10:00:09 INFO user1 GET /home 200
+2026-02-18 10:00:10 INFO user2 GET /settings 200
+2026-02-18 10:00:11 INFO user1 GET /home 200
+2026-02-18 10:00:12 INFO user2 GET /dashboard 200
+2026-02-18 10:00:13 INFO user1 GET /settings 200
+2026-02-18 10:00:14 INFO user2 GET /home 200
+2026-02-18 10:00:15 INFO user1 POST /update 200
+2026-02-18 10:00:16 INFO user2 GET /home 200
+2026-02-18 10:00:17 INFO user1 GET /profile 200
+2026-02-18 10:00:18 INFO user2 GET /dashboard 200
+2026-02-18 10:00:19 INFO user1 GET /home 200
+2026-02-18 10:00:20 INFO user2 GET /settings 200
+2026-02-18 10:00:21 CRITICAL system unexpected_timeout_999 $
+2026-02-18 10:00:22 INFO user1 GET /home 200
+2026-02-18 10:00:23 INFO user2 GET /dashboard 200
+2026-02-18 10:00:24 INFO user1 GET /settings 200
+2026-02-18 10:00:25 INFO user2 GET /home 200
+2026-02-18 10:00:26 INFO user1 POST /update 200
+2026-02-18 10:00:27 WARN security unusual_access_pattern_detected $
+2026-02-18 10:00:28 INFO user2 GET /home 200
+2026-02-18 10:00:29 INFO user1 GET /profile 200
+2026-02-18 10:00:30 ERROR firewall hack_attempt_detected $

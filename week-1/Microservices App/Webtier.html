@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My AWS Nginx Server</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 80px;
+            background-color: #f4f6f9;
+        }
+
+        h1 { 
+            color: #2c3e50; 
+        }
+
+        p { 
+            color: #555; 
+            font-size: 18px; 
+        }
+
+        .btn-container {
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🚀 Nginx Deployed Successfully!</h1>
+    <p>Your Ubuntu AWS instance is running a static website.</p>
+
+    <div class="btn-container">
+        <a href="http://loadbalancer-1268574844.us-east-1.elb.amazonaws.com/users" class="btn">View Users</a>
+        <a href="http://loadbalancer-1268574844.us-east-1.elb.amazonaws.com/orders" class="btn">View Orders</a>
+    </div>
+
+</body>
+</html>
