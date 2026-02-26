@@ -1,0 +1,243 @@
+:root {
+    --primary: #6366f1;
+    --secondary: #22d3ee;
+    --danger: #ef4444;
+    --glass: rgba(255, 255, 255, 0.65);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    height: 100vh;
+    display: flex;
+    background:
+        radial-gradient(circle at 10% 10%, #c7d2fe 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, #bae6fd 0%, transparent 40%),
+        linear-gradient(120deg, #eef2ff, #ecfeff);
+}
+
+/* ===== SIDEBAR (LIGHT & PREMIUM) ===== */
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #e0e7ff, #cffafe);
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 6px 0 25px rgba(0,0,0,0.12);
+}
+
+/* ===== LOGO ===== */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 40px;
+    padding: 14px;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #6366f1, #22d3ee);
+    box-shadow: 0 12px 30px rgba(99,102,241,0.45);
+}
+
+.logo-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.9));
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.6px;
+}
+
+/* ===== SIDEBAR BUTTONS ===== */
+.sidebar button {
+    background: transparent;
+    border: none;
+    color: #1e293b;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.35s ease;
+}
+
+.sidebar button:hover {
+    background: rgba(99,102,241,0.15);
+    transform: translateX(6px);
+}
+
+.sidebar button.active {
+    background: linear-gradient(90deg, #6366f1, #22d3ee);
+    color: white;
+    box-shadow: 0 10px 25px rgba(99,102,241,0.45);
+}
+
+.sidebar .foot {
+    margin-top: auto;
+}
+
+.sidebar .foot button {
+    width: 100%;
+}
+
+.sidebar .logout {
+    width: 100%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    color: white;
+}
+
+/* ===== USER PROFILE ===== */
+.user-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;   /* ✅ center horizontally */
+    gap: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    width: 100%;
+    background: lightslategray;
+}
+
+.user-avatar {
+    font-size: 18px;
+    color: white;
+}
+
+.user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+/* ===== GLASS SECTIONS ===== */
+.section {
+    display: none;
+    padding: 35px;
+    border-radius: 24px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow:
+        0 25px 50px rgba(0,0,0,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.4);
+    backdrop-filter: blur(16px);
+    animation: fadeUp 0.6s ease;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #020617;
+}
+
+/* ===== INPUTS ===== */
+input, textarea {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 14px;
+    background: rgba(255,255,255,0.85);
+    transition: all 0.3s;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.25);
+    background: white;
+}
+
+/* ===== BUTTONS ===== */
+.action-btn {
+    padding: 12px 22px;
+    border-radius: 14px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #6366f1, #22d3ee);
+    color: white;
+    box-shadow: 0 12px 30px rgba(99,102,241,0.4);
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    color: white;
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+thead {
+    background: linear-gradient(90deg, #e0e7ff, #ecfeff);
+}
+
+th, td {
+    padding: 14px;
+    font-size: 14px;
+    text-align: center;
+}
+
+tbody tr:hover {
+    background: rgba(99,102,241,0.08);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #a5b4fc;
+    border-radius: 10px;
+}

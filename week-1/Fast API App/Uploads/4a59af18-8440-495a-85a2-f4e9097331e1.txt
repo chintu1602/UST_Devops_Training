@@ -1,0 +1,5 @@
+ATM Session Simulation
+Simulate ATM behavior:
+-Infinite loop waiting for user
+-Limit wrong PIN attempts to 3
+-Exit session after success or failure

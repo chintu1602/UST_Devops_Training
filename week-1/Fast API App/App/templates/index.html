@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Documents</title>
+<link rel="stylesheet" href="/static/docs.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">Document Router</span>
+    </div>
+
+    <button id="upload-btn" class="active" onclick="showSection('upload', 'upload-btn')">Upload Document</button>
+    <button id="documents-btn" onclick="showSection('documents', 'documents-btn')">All Documents</button>
+    <button id="search-btn" onclick="showSection('search', 'search-btn')">Search by Tag</button>
+    <button id="versions-btn" onclick="showSection('versions', 'versions-btn')">Versions</button>
+    
+    <div class="foot">
+        <div class="user-profile">
+            <div class="user-avatar"><i class="fa fa-user-circle-o"></i></div>
+            <span class="user-name">{{ username }}</span>
+        </div>
+
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+    
+</div>
+
+<div class="main">
+
+<div id="upload" class="section active">
+    <h2>Upload Document</h2>
+    <form id = "uploadForm" enctype="multipart/form-data" onsubmit = "upload_doc(event)">
+        <input type="text" placeholder="Title" name="title" required>
+        <textarea placeholder="Description" name="description" required></textarea>
+        <input type="text" placeholder="Tags (comma separated)" name="tag">
+        <input type="file" name="file" accept = ".pdf, .doc, .docx, .txt" required>
+        <button type="submit" class="action-btn btn-primary">Upload</button>
+    </form>
+</div>
+
+<div id="documents" class="section">
+    <div id = "docsTable" display="block">
+        <h2>All Documents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Tags</th>
+                    <th>Versions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Documents will be taken here dynamically -->
+            </tbody>
+        </table>
+    </div>
+    <div id="updateDoc" style="display:none">
+        <h3>Update Document</h3>
+        <form id="updateForm" onsubmit="update_document(event)">
+            <input type="hidden" id="doc_id" value="">
+            <input type="text" id="updated_title" placeholder="Title">
+            <textarea id="updated_description" placeholder="Description"></textarea>
+            <input type="text" id="updated_tag" placeholder="Tags (comma separated)">
+            <button type="submit" class="action-btn btn-primary">Update</button>
+        </form>
+    </div>
+
+</div>
+
+<div id="search" class="section">
+    <h2>Search by Tag</h2>
+    <input type="text" placeholder="Enter tag" id="tagInput">
+    <button class="action-btn btn-primary" onclick="searchByTag()">Search</button>
+
+    <table id ="searchResults" style="display:none">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Tags</th>
+                <th>Versions</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Search results will be taken here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<div id="versions" class="section">
+    <div id="versionsTable" style="display:block">
+    <h2>All Versions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Doc ID</th>
+                    <th>Version ID</th>
+                    <th>Title</th>
+                    <th>Version</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Versions will be taken here dynamically -->
+            </tbody>
+        </table>
+    </div>
+    <div id="versionUpload" style="display:none">
+        <h3>Upload New Version</h3>
+        <form id="versionForm" enctype="multipart/form-data" onsubmit="upload_version(event)">
+            <label for="document_id">Document ID:</label>
+            <input type="number" id="document_id" value="" readonly>
+            <input type="file" name="file" accept = ".pdf, .doc, .docx, .txt" required>
+            <button type="submit" class="action-btn btn-primary">Upload</button>
+        </form>
+    </div>
+</div>
+
+</div>
+
+<script>
+function showSection(id, btnId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+    document.getElementById(btnId).classList.add('active');
+
+    if (id === "documents") {
+        loadDocuments();
+        document.getElementById("docsTable").style.display = "block";
+        document.getElementById("updateDoc").style.display = "none";
+    }
+
+    if (id === "search") {
+        document.getElementById("searchResults").style.display = "none";
+    }
+
+    if (id === "versions") {
+        document.getElementById("versionsTable").style.display = "block";
+        document.getElementById("versionUpload").style.display = "none";
+    }
+}
+
+async function upload_doc(event){
+    event.preventDefault();
+    const form = document.getElementById("uploadForm");
+    const formData = new FormData(form);
+
+    try{
+        const response = await fetch("/documents/add", {
+            method: "POST",
+            body: formData
+        });
+
+        
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Something went wrong");
+        }
+        form.reset();
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: data.message,
+            timer: 1000,
+            showConfirmButton: false,
+        });
+    }
+    catch(error){
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+        });
+    }
+}
+
+async function loadDocuments() {
+    const res = await fetch("/documents/list_all");
+    const docs = await res.json();
+
+    const tbody = document.querySelector("#documents tbody");
+    tbody.innerHTML = "";
+
+    docs.forEach(doc => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${doc.id}</td>
+            <td>${doc.title}</td>
+            <td>${doc.description}</td>
+            <td>${doc.tag}</td>
+            <td>
+                <button class="action-btn btn-primary" onclick = "add_version(${doc.id})">Add</button>
+                <button class="action-btn btn-secondary" onclick = "view_versions(${doc.id},'${doc.title}')">View</button>
+            </td>
+            <td>
+                <button class="action-btn btn-primary" onclick = "edit_document(${doc.id})">Edit</button>
+                <button class="action-btn btn-danger" onclick = "delete_document(${doc.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+function add_version(docId){
+    showSection("versions", "versions-btn");
+    document.getElementById("versionsTable").style.display = "none";
+    document.getElementById("document_id").value = docId;
+    document.getElementById("versionUpload").style.display = "block";
+}
+
+async function upload_version(event){
+    event.preventDefault();
+    const form = document.getElementById("versionForm");
+    const formData = new FormData(form);
+    formData.delete("document_id");
+    const docId = document.getElementById("document_id").value;
+
+    try{
+        const response = await fetch(`/documents/${docId}/versions`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Something went wrong");
+        }
+        form.reset();
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: data.message,
+            timer: 1000,
+            showConfirmButton: false,
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+    catch(error){
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+        });
+    }
+}
+
+async function view_versions(docId, docTitle) {
+    const res = await fetch(`/documents/${docId}/versions`);
+    const versions = await res.json();
+
+    const tbody = document.querySelector("#versions tbody");
+    tbody.innerHTML = "";
+
+    versions.forEach(v => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${docId}</td>
+            <td>${v.id}</td>
+            <td>${docTitle}</td>
+            <td>v${v.version}</td>
+            <td>${v.created_at}</td>
+            <td>
+                <button class="action-btn btn-primary" onclick="download_version(${docId},${v.id})">Download</button>
+                <button class="action-btn btn-secondary" onclick="preview_version(${docId},${v.id})">Preview</button>
+            </td>
+        </tr>`;
+    });
+
+    showSection("versions", "versions-btn");
+}
+
+function edit_document(docId){
+    showSection("documents", "documents-btn");
+    document.getElementById("docsTable").style.display = "none";
+    document.getElementById("updateDoc").style.display = "block";
+    document.getElementById("doc_id").value = docId;
+}
+
+async function update_document(event) {
+    event.preventDefault();
+
+    const docId = document.getElementById("doc_id").value;
+
+    const payload = {
+        title: document.getElementById("updated_title").value || null,
+        description: document.getElementById("updated_description").value || null,
+        tag: document.getElementById("updated_tag").value || null
+    };
+
+    try {
+        const response = await fetch(`/documents/update/${docId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.detail || "Update failed");
+        }
+
+        document.getElementById("updateForm").reset();
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: result.message,
+            timer: 1000,
+            showConfirmButton: false,
+        }).then(showSection("documents", "documents-btn"));
+
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+        });
+    }
+}
+
+
+async function delete_document(docId) {
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This document will be permanently deleted!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const response = await fetch(`/documents/delete/${docId}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Delete failed");
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: data.message || "Document deleted successfully",
+            timer: 1000,
+            showConfirmButton: false,
+        }).then(showSection("documents", "documents-btn"));
+
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+        });
+    }
+}
+
+
+function preview_version(docId, versionId) {
+    window.location.href = `/documents/${docId}/versions/${versionId}/preview`;
+}
+
+function download_version(docId, versionId) {
+    window.location.href = `/documents/${docId}/versions/${versionId}/download`;
+}
+
+async function searchByTag() {
+    const input = document.getElementById("tagInput");
+    const tag = input.value.trim();
+
+    if (!tag) return;
+
+    const res = await fetch(`/documents/tag_search?tag=${tag}`);
+    const docs = await res.json();
+
+    const table = document.getElementById("searchResults");
+    table.style.display = "table";
+
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    docs.forEach(doc => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${doc.id}</td>
+            <td>${doc.title}</td>
+            <td>${doc.description}</td>
+            <td>${doc.tag}</td>
+            <td>
+                <button class="action-btn btn-primary" onclick = "add_version(${doc.id})">Add</button>
+                <button class="action-btn btn-secondary" onclick = "view_versions(${doc.id},'${doc.title}')">View</button>
+            </td>
+            <td>
+                <button class="action-btn btn-primary" onclick = "edit_document(${doc.id})">Edit</button>
+                <button class="action-btn btn-danger" onclick = "delete_document(${doc.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+
+    input.value = "";
+}
+
+function logout() {
+    window.location.href = "/auth/logout";
+}
+
+</script>
+
+</body>
+</html>

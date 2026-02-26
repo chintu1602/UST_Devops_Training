@@ -1,0 +1,111 @@
+<html>
+    <head>
+        <title>Authentication</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <div class="back">
+            <div class="box">
+                <center><h2>Authentication</h2></center>
+                <div class="btn-box">
+                    <div id="btn"></div>
+                    <button type="button" class="toggle-btn" onclick="login()">Log In</button>
+                    <button type="button" class="toggle-btn" onclick="register()">Register</button>
+                </div>
+                <form id="login" class="inp" action = "/auth/login" method = 'POST' onsubmit="loginUser(event)">
+                    <input type="text" class="inp-field" id="username" name="username" placeholder="Username" required>
+                    <br>
+                    <input type="password" class="inp-field" id="password" name="password"placeholder="Enter Password" required>
+                    <br><br>
+                    <button type="submit" class="sub-btn">Log In</button>
+                    <br>
+                    <p>Don't have an account? <a href="javascript:void(0)" onclick = "register()">Register</a>
+                </form>
+
+                <form id="register" class="inp" onsubmit="registerUser(event)">
+                    <input type="text" class="inp-field" id="username" name="username" placeholder="Username" required>
+                    <br>
+                    <input type="password" class="inp-field" id="password" name="password"placeholder="Enter Password" required>
+                    <br><br>
+                    <button type="submit" class="sub-btn">Sign Up</button>
+                    <br>
+                    <p>Already have an account? <a href="javascript:void(0)" onclick = "login()">Login</a>
+                </form>
+            </div>           
+        </div>
+        <script>
+            var x = document.getElementById("login");
+            var y = document.getElementById("register");
+            var z = document.getElementById("btn");
+
+            function register(){
+                x.style.left = "-400px";
+                y.style.left = "50px";
+                z.style.left = "110px";
+            }
+            function login(){
+                x.style.left = "50px";
+                y.style.left = "450px";
+                z.style.left = "0";
+            }
+            async function registerUser(event){
+                event.preventDefault();
+                form = document.getElementById("register");
+                const formData = new FormData(form);
+
+                try{
+                    const response = await fetch("/auth/register", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.detail || "Something went wrong");
+                    }
+                    form.reset();
+                    Swal.fire({
+                        color: "green",
+                        title: "Success",
+                        text: data.message,
+                        timer: 1000,
+                        showConfirmButton: false,
+                    });
+                }
+                catch(error){
+                    Swal.fire({
+                        color: "red",
+                        title: "Error",
+                        text: error.message || "Registration failed",
+                    });
+                }
+            }
+            async function loginUser(event){
+                event.preventDefault();
+                form = document.getElementById("login");
+                const formData = new FormData(form);
+
+                try{
+                    const response = await fetch("/auth/login", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Invalid username or password");
+                    }
+                    form.submit();
+                }
+                catch(error){
+                    Swal.fire({
+                        color: "red",
+                        title: "Error",
+                        text: error.message,
+                    });
+                }
+            }
+        </script>
+    </body>
+</html>
