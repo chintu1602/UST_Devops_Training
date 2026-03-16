@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sql
+  namespace: two
+  labels:
+    app: sqlpod
+spec:
+  containers:
+  - name: con
+    image: mysql:8.0
+    envFrom:
+    - configMapRef:
+        name: sqlcf
+    - secretRef:
+        name: sqls
+    ports:
+    - containerPort: 3306

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: twocf
+  namespace: two
+data:
+  DATA_SOURCE_URL: "jdbc:mysql://sqlservice:3306/retailsdb"

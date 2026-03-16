@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sqls
+  namespace: two
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: cm9vdHBhc3M=
+  MYSQL_USER: YXBwdXNlcg==
+  MYSQL_PASSWORD: YXBwcGFzc3dvcmQ=

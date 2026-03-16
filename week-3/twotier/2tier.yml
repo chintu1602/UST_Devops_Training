@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my2
+  namespace: two
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: twotier
+  template:
+    metadata:
+      name: podtwo
+      labels:
+        app: twotier
+    spec:
+      containers:
+      - name: c11
+        image: yaswanthreddy1602/2tier:v2
+        envFrom:
+        - configMapRef:
+            name: twocf
+        - secretRef:
+            name: twos
+        ports:
+        - containerPort: 8080

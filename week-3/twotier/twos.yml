@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: twos
+  namespace: two
+type: Opaque
+data:
+  USERNAME: YXBwdXNlcg==
+  PASSWORD: YXBwcGFzc3dvcmQ=

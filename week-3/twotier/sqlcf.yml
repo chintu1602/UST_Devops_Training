@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sqlcf
+  namespace: two
+data:
+  MYSQL_DATABASE: "retailsdb"
