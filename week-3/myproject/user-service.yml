@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: banking-app
+ 
+spec:
+  type: ClusterIP
+  selector:
+    app: user-app
+ 
+  ports:
+    - port: 3001
+      targetPort: 3001
+ 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+  namespace: banking-app
+data:
+  DB_HOST: mysql
+  DB_USER: root
+  DB_NAME: banking_db
+  REDIS_HOST: redis
+  PORT: "3001"
+ 
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-service-secret
+  namespace: banking-app
+type: Opaque
+stringData:
+  DB_PASS: rootpassword
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+  namespace: banking-app
+ 
+spec:
+  replicas: 2
+ 
+  selector:
+    matchLabels:
+      app: user-app
+ 
+  template:
+    metadata:
+      labels:
+        app: user-app
+ 
+    spec:
+      containers:
+        - name: user-container
+          image: yaswanthreddy1602/user-service:v1
+ 
+          ports:
+            - containerPort: 3001
+ 
+          envFrom:
+            - configMapRef:
+                name: user-service-config
+            - secretRef:
+                name: user-service-secret

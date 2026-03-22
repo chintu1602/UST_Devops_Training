@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: account-secret
+  namespace: banking-app
+stringData:
+  DB_HOST: "mysql"
+  DB_USER: "root"
+  DB_PASS: "rootpassword"
+  DB_NAME: "banking_db"
+  REDIS_HOST: "redis"
+ 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: account-config
+  namespace: banking-app
+data:
+  PORT: "3002"
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: account
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: account
+  template:
+    metadata:
+      labels:
+        app: account
+    spec:
+      containers:
+        - name: account
+          image: yaswanthreddy1602/account-service:v1
+          ports:
+            - containerPort: 3002
+          envFrom:
+            - secretRef:
+                name: account-secret
+            - configMapRef:
+                name: account-config
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-service
+  namespace: banking-app
+spec:
+  selector:
+    app: account
+  ports:
+    - port: 3002
+      targetPort: 3002
+  type: ClusterIP

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-nfs
+  namespace: nfs-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-pod
+  template:
+    metadata:
+      labels:
+        app: nfs-pod
+    spec:
+      containers:
+      - name: c1
+        image: nginx
+        volumeMounts:
+        - name: mynfsvol
+          mountPath: /mydata
+      volumes:
+      - name: mynfsvol
+        persistentVolumeClaim:
+          claimName: nfspvc

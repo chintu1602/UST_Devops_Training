@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-detection
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fraud-detection
+  template:
+    metadata:
+      labels:
+        app: fraud-detection
+    spec:
+      containers:
+        - name: fraud-detection
+          image: yaswanthreddy1602/fraud-detection-service:v1
+          ports:
+            - containerPort: 3007
+          envFrom:
+            - configMapRef:
+                name: fraud-detection-config
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: fraud-detection-service
+  namespace: banking-app
+spec:
+  selector:
+    app: fraud-detection
+  ports:
+    - port: 3007
+      targetPort: 3007
+  type: ClusterIP
+ 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fraud-detection-config
+  namespace: banking-app
+data:
+  MQ_URL: "amqp://rabbitmq"
+  PORT: "3007"

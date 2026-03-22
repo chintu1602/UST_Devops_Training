@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: banking-app
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: cm9vdHBhc3N3b3Jk
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+  namespace: banking-app
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS banking_db;
+    USE banking_db;
+
+    CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS accounts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        account_number VARCHAR(50) UNIQUE NOT NULL,
+        balance DECIMAL(15, 2) DEFAULT 0.00,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS transactions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        from_account_id INT,
+        to_account_id INT,
+        amount DECIMAL(15, 2) NOT NULL,
+        status VARCHAR(50) NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS loans (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        amount DECIMAL(15, 2) NOT NULL,
+        status VARCHAR(50) DEFAULT 'PENDING',
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mypv
+spec:
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /bank
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc
+  namespace: banking-app
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: ""
+  volumeName: mypv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: banking-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              value: banking_db
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mypvc
+        - name: init-script
+          configMap:
+            name: mysql-init-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: banking-app
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP

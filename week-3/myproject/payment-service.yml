@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-secret
+  namespace: banking-app
+type: Opaque
+stringData:
+  ACCOUNT_SVC_URL: "http://account-service:3002"
+ 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: banking-app
+data:
+  PORT: "3004"
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment
+          image: yaswanthreddy1602/payment-service:v1
+          ports:
+            - containerPort: 3004
+          envFrom:
+            - secretRef:
+                name: payment-secret
+            - configMapRef:
+                name: payment-config
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: banking-app
+spec:
+  selector:
+    app: payment
+  ports:
+    - port: 3004
+      targetPort: 3004
+  type: ClusterIP

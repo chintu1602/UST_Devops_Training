@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: task1pod
+spec:
+  containers:
+  - name: con
+    image: nginx
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: myvol
+  volumes:
+  - name: myvol
+    persistentVolumeClaim:
+      claimName: taskpvc1

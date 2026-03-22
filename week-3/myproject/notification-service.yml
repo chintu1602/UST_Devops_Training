@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: yaswanthreddy1602/notification-service:v1
+        ports:
+        - containerPort: 3006
+        envFrom:
+        - configMapRef:
+            name: notification-service-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: banking-app
+spec:
+  selector:
+    app: notification-service
+  ports:
+  - port: 3006
+    targetPort: 3006
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config
+  namespace: banking-app
+data:
+  MQ_URL: "amqp://rabbitmq"
+  PORT: "3006"

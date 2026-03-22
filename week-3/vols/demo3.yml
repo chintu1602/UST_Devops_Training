@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo3
+spec:
+  containers:
+  - name: c6
+    image: busybox
+    command: ["sleep","3600"]
+    volumeMounts:
+    - mountPath: /mydata
+      name: myvol
+  volumes:
+  - name: myvol
+    persistentVolumeClaim:
+      claimName: pvcdemo

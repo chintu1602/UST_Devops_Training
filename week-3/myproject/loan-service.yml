@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loan-service
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: loan-service
+  template:
+    metadata:
+      labels:
+        app: loan-service
+    spec:
+      containers:
+      - name: loan-service
+        image: yaswanthreddy1602/loan-service:v1
+        ports:
+        - containerPort: 3005
+        envFrom:
+        - configMapRef:
+            name: loan-service-config
+        - secretRef:
+            name: loan-service-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loan-service
+  namespace: banking-app
+spec:
+  selector:
+    app: loan-service
+  ports:
+  - port: 3005
+    targetPort: 3005
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loan-service-config
+  namespace: banking-app
+data:
+  DB_HOST: mysql
+  DB_USER: root
+  DB_NAME: banking_db
+  PORT: "3005"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: loan-service-secret
+  namespace: banking-app
+type: Opaque
+stringData:
+  DB_PASS: "rootpassword"

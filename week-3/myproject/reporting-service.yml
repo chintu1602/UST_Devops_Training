@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reporting-service
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: reporting-service
+  template:
+    metadata:
+      labels:
+        app: reporting-service
+    spec:
+      containers:
+      - name: reporting-service
+        image: yaswanthreddy1602/reporting-service:v1
+        ports:
+        - containerPort: 3010
+        envFrom:
+        - configMapRef:
+            name: reporting-service-config
+        - secretRef:
+            name: reporting-service-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reporting-service
+  namespace: banking-app
+spec:
+  selector:
+    app: reporting-service
+  ports:
+  - port: 3010
+    targetPort: 3010
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-service-config
+  namespace: banking-app
+data:
+  DB_HOST: mysql
+  DB_USER: root
+  DB_NAME: banking_db
+  PORT: "3010"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: reporting-service-secret
+  namespace: banking-app
+type: Opaque
+stringData:
+  DB_PASS: "rootpassword"

@@ -1,0 +1,9 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-default-storage-class
+provisioner: cluster.local/dev-nfs-provisioner-nfs-subdir-external-provisioner
+reclaimPolicy: Delete
+parameters:
+  pathPattern: "${.PVC.namespace}-${.PVC.name}"
+  onDelete: delete
