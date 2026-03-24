@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: monit
+rules:
+- apiGroups: [""] #"" indicates the core api group
+  verbs: ["get","watch","list"]
+  resources: ["pods","pods/log"]
+  # resourceNames: ["mydep","nginx"]
