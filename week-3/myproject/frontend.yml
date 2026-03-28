@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  namespace: banking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: f1
+        image: thamizhanm3/bank-frontend:v1
+        envFrom:
+        - configMapRef:
+            name: fcm
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-proxy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: banking-app
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30030
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fcm
+  namespace: banking-app
+data:
+  USER_URL: "/api/user"
+  ACCOUNT_URL: "/api/account"
+  TX_URL: "/api/tx"
+  LOAN_URL: "/api/loan"
+  REPORT_URL: "/api/report"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-proxy-config
+  namespace: banking-app
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /usr/share/nginx/html;
+      index index.html;
+
+      location /api/user/ {
+        proxy_pass http://user-service:3001/;
+      }
+      location /api/account/ {
+        proxy_pass http://account-service:3002/;
+      }
+      location /api/tx/ {
+        proxy_pass http://transaction-service:3003/;
+      }
+      location /api/loan/ {
+        proxy_pass http://loan-service:3005/;
+      }
+      location /api/report/ {
+        proxy_pass http://reporting-service:3010/;
+      }
+
+      location / {
+        try_files $uri /index.html;
+      }
+
+      location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri /index.html;
+      }
+    }
